@@ -231,9 +231,7 @@ python manage.py test
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
 
 ## 🎯 Resume Highlights
 
@@ -247,13 +245,4 @@ This project demonstrates:
 - **Testing**: Comprehensive test coverage
 - **Deployment Ready**: Production-ready configuration
 
-## 📞 Support
 
-For questions or support:
-- Create an issue in the repository
-- Check the Django documentation
-- Review the code comments for implementation details
-
----
-
-**Built with ❤️ using Django and Bootstrap 5**

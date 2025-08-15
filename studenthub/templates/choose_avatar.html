@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}Choose Avatar - StudentHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-4 d-inline-block">
+                        <i class="bi bi-person-circle text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+                <h1 class="display-6 fw-bold text-gradient mb-3" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    Choose Your Avatar
+                </h1>
+                <p class="text-muted fs-5">Select an avatar that represents you best</p>
+            </div>
+
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient text-white text-center py-4" style="background: var(--primary-gradient);">
+                    <h3 class="mb-0 fw-bold">
+                        <i class="bi bi-person-circle me-2"></i>Avatar Selection
+                    </h3>
+                </div>
+                <div class="card-body p-5">
+                    <form method="post" id="avatarForm">
+                        {% csrf_token %}
+                        
+                        <div class="row g-4 mb-4">
+                            {% for avatar in avatars %}
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="avatar-option">
+                                        <input type="radio" name="avatar" id="avatar_{{ forloop.counter }}" 
+                                               value="{{ avatar }}" class="avatar-radio" required>
+                                        <label for="avatar_{{ forloop.counter }}" class="avatar-label">
+                                            <div class="avatar-preview">
+                                                <img src="/media/{{ avatar }}" alt="Avatar" class="avatar-image">
+                                                <div class="avatar-overlay">
+                                                    <i class="bi bi-check-circle-fill"></i>
+                                                </div>
+                                            </div>
+                                            <div class="avatar-name">{{ avatar|cut:"avatars/" }}</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold me-3">
+                                <i class="bi bi-check-circle me-2"></i>Update Avatar
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Instructions Card -->
+            <div class="card mt-4 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="bi bi-info-circle text-info" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="card-title text-info fw-semibold mb-2">
+                                How to add more avatars:
+                            </h6>
+                            <p class="card-text text-muted mb-0">
+                                To add more avatar options, simply place PNG, JPG, or GIF files in the 
+                                <code class="bg-light px-2 py-1 rounded">media/avatars/</code> directory. 
+                                The system will automatically detect and display them here.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background-size: 200% 200%;
+        animation: gradient 3s ease infinite;
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .card {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+        border: none;
+        padding: 2rem;
+    }
+
+    .avatar-option {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .avatar-radio {
+        display: none;
+    }
+
+    .avatar-label {
+        cursor: pointer;
+        display: block;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .avatar-preview {
+        position: relative;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        border: 3px solid transparent;
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(102, 126, 234, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .avatar-overlay i {
+        color: white;
+        font-size: 2rem;
+    }
+
+    .avatar-name {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    /* Selected state */
+    .avatar-radio:checked + .avatar-label .avatar-preview {
+        border-color: #667eea;
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+
+    .avatar-radio:checked + .avatar-label .avatar-overlay {
+        opacity: 1;
+    }
+
+    .avatar-radio:checked + .avatar-label .avatar-name {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    /* Hover effects */
+    .avatar-label:hover .avatar-preview {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .avatar-label:hover .avatar-image {
+        transform: scale(1.1);
+    }
+
+    .btn {
+        border-radius: var(--border-radius-sm);
+        font-weight: 600;
+        padding: 1rem 2rem;
+        transition: all 0.3s ease;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #6b7280;
+        color: #6b7280;
+        background: transparent;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #6b7280;
+        border-color: #6b7280;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .bg-gradient {
+        background-size: 200% 200%;
+        animation: gradient 3s ease infinite;
+    }
+
+    code {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+        
+        .btn {
+            padding: 0.875rem 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .avatar-image {
+            height: 100px;
+        }
+    }
+
+    /* Animation for avatar selection */
+    .avatar-option {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .avatar-option:nth-child(1) { animation-delay: 0.1s; }
+    .avatar-option:nth-child(2) { animation-delay: 0.2s; }
+    .avatar-option:nth-child(3) { animation-delay: 0.3s; }
+    .avatar-option:nth-child(4) { animation-delay: 0.4s; }
+    .avatar-option:nth-child(5) { animation-delay: 0.5s; }
+    .avatar-option:nth-child(6) { animation-delay: 0.6s; }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth selection animation
+    const avatarRadios = document.querySelectorAll('.avatar-radio');
+    avatarRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Remove previous selections
+            document.querySelectorAll('.avatar-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to current option
+            if (this.checked) {
+                this.closest('.avatar-option').classList.add('selected');
+            }
+        });
+    });
+
+    // Form submission enhancement
+    const form = document.getElementById('avatarForm');
+    form.addEventListener('submit', function(e) {
+        const selectedAvatar = document.querySelector('input[name="avatar"]:checked');
+        if (!selectedAvatar) {
+            e.preventDefault();
+            alert('Please select an avatar before submitting.');
+            return;
+        }
+        
+        // Add loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>Updating...';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}

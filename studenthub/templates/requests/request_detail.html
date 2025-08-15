@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ request_obj.title }} - StudentHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Request Header -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient text-white p-4" style="background: var(--warning-gradient);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="h2 fw-bold mb-2">{{ request_obj.title }}</h1>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="badge bg-light text-dark">{{ request_obj.get_category_display }}</span>
+                                {% if request_obj.is_urgent %}
+                                    <span class="badge bg-danger">Urgent</span>
+                                {% endif %}
+                                <span class="badge bg-{{ request_obj.status|yesno:'success,warning,info,secondary' }}">
+                                    {{ request_obj.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <h3 class="fw-bold text-white mb-1">${{ request_obj.fee }}</h3>
+                            <small class="text-white-50">Requested Fee</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <h5 class="fw-bold mb-3">Description</h5>
+                            <p class="text-muted mb-4">{{ request_obj.description }}</p>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-person text-primary me-2"></i>
+                                        <div>
+                                            <small class="text-muted">Requested by</small>
+                                            <div class="fw-semibold">{{ request_obj.requester.username }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-geo-alt text-success me-2"></i>
+                                        <div>
+                                            <small class="text-muted">Location</small>
+                                            <div class="fw-semibold">{{ request_obj.location|default:"Anywhere" }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if request_obj.deadline %}
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-warning me-2"></i>
+                                            <div>
+                                                <small class="text-muted">Deadline</small>
+                                                <div class="fw-semibold">{{ request_obj.deadline|date:"M d, Y H:i" }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-chat-dots text-info me-2"></i>
+                                        <div>
+                                            <small class="text-muted">Contact via</small>
+                                            <div class="fw-semibold">{{ request_obj.get_contact_preference_display }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Contact Information Display -->
+                            {% if request_obj.phone or request_obj.email %}
+                                <div class="card bg-light border-0 mb-4">
+                                    <div class="card-body">
+                                        <h6 class="fw-semibold mb-3">
+                                            <i class="bi bi-person-lines-fill me-2 text-primary"></i>Contact Information
+                                        </h6>
+                                        <div class="row g-3">
+                                            {% if request_obj.phone %}
+                                                <div class="col-md-6">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-telephone text-success me-2"></i>
+                                                        <div>
+                                                            <small class="text-muted">Phone</small>
+                                                            <div class="fw-semibold">{{ request_obj.phone }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                            {% if request_obj.email %}
+                                                <div class="col-md-6">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="bi bi-envelope text-info me-2"></i>
+                                                        <div>
+                                                            <small class="text-muted">Email</small>
+                                                            <div class="fw-semibold">{{ request_obj.email }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                Use the contact information above to reach out to the requester directly.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <h6 class="fw-bold mb-3">Request Summary</h6>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <div class="text-center">
+                                                <h5 class="fw-bold text-success mb-1">${{ request_obj.fee }}</h5>
+                                                <small class="text-muted">Fee</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center">
+                                                <h5 class="fw-bold text-primary mb-1">{{ request_obj.total_offers }}</h5>
+                                                <small class="text-muted">Offers</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if request_obj.can_be_fulfilled %}
+                                        <div class="mt-3">
+                                            <small class="text-success">
+                                                <i class="bi bi-check-circle me-1"></i>Open for offers
+                                            </small>
+                                        </div>
+                                    {% else %}
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock me-1"></i>{{ request_obj.get_status_display }}
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="mt-3">
+                                        <small class="text-muted">
+                                            Posted {{ request_obj.created_at|timesince }} ago
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    {% if user.is_authenticated %}
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="d-flex gap-3 justify-content-center">
+                    {% if request_obj.requester == user %}
+                        <!-- Requester Actions -->
+                        <a href="{% url 'requests:request_edit' request_obj.pk %}" class="btn btn-outline-primary">
+                            <i class="bi bi-pencil me-2"></i>Edit Request
+                        </a>
+                        <a href="{% url 'requests:offer_manage' request_obj.pk %}" class="btn btn-outline-info">
+                            <i class="bi bi-list-ul me-2"></i>Manage Offers ({{ request_obj.total_offers }})
+                        </a>
+                        {% if request_obj.status == 'open' %}
+                            <a href="{% url 'requests:request_delete' request_obj.pk %}" class="btn btn-outline-danger">
+                                <i class="bi bi-trash me-2"></i>Delete Request
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <!-- Other User Actions -->
+                        {% if request_obj.can_be_fulfilled %}
+                            {% if user_offer %}
+                                <div class="d-flex gap-2">
+                                    <span class="btn btn-success disabled">
+                                        <i class="bi bi-check-circle me-2"></i>Offer Submitted
+                                    </span>
+                                    <a href="#" class="btn btn-outline-warning">
+                                        <i class="bi bi-pencil me-2"></i>Edit Offer
+                                    </a>
+                                </div>
+                            {% else %}
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#offerModal">
+                                    <i class="bi bi-hand-thumbs-up me-2"></i>Make Offer
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Offers Section -->
+    {% if offers %}
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light border-0">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="bi bi-hand-thumbs-up me-2"></i>Offers ({{ offers.count }})
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for offer in offers %}
+                            <div class="border-bottom pb-3 mb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                            <i class="bi bi-person text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-semibold mb-1">{{ offer.fulfiller.username }}</h6>
+                                            <small class="text-muted">{{ offer.created_at|timesince }} ago</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <h5 class="fw-bold text-success mb-1">${{ offer.proposed_fee }}</h5>
+                                        <span class="badge bg-{{ offer.status|yesno:'success,warning,info,secondary' }}">
+                                            {{ offer.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <p class="text-muted mb-2">{{ offer.message }}</p>
+                                    {% if offer.estimated_delivery %}
+                                        <small class="text-muted">
+                                            <i class="bi bi-calendar-event me-1"></i>
+                                            Estimated delivery: {{ offer.estimated_delivery|date:"M d, Y H:i" }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if request_obj.requester == user and offer.status == 'pending' %}
+                                    <div class="mt-3 d-flex gap-2">
+                                        <form method="post" action="{% url 'requests:offer_accept' offer.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="bi bi-check me-1"></i>Accept
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'requests:offer_reject' offer.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-x me-1"></i>Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10 text-center">
+            <a href="{% url 'requests:request_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Requests
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Offer Modal -->
+{% if user.is_authenticated and request_obj.can_be_fulfilled and not user_offer %}
+    <div class="modal fade" id="offerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-hand-thumbs-up me-2"></i>Make an Offer
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ offer_form.proposed_fee.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-cash me-2"></i>Proposed Fee
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ offer_form.proposed_fee }}
+                            </div>
+                            {% if offer_form.proposed_fee.help_text %}
+                                <div class="form-text">{{ offer_form.proposed_fee.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ offer_form.message.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-chat-dots me-2"></i>Message
+                            </label>
+                            {{ offer_form.message }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ offer_form.estimated_delivery.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-calendar-event me-2"></i>Estimated Delivery
+                            </label>
+                            {{ offer_form.estimated_delivery }}
+                            {% if offer_form.estimated_delivery.help_text %}
+                                <div class="form-text">{{ offer_form.estimated_delivery.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-circle me-2"></i>Submit Offer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<style>
+    .card {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn {
+        border-radius: var(--border-radius-sm);
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .bg-gradient {
+        background-size: 200% 200%;
+        animation: gradient 3s ease infinite;
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+    }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .form-control, .form-select {
+        border-radius: var(--border-radius-sm);
+        border: 2px solid #e5e7eb;
+        padding: 0.875rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+
+    .input-group-text {
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-right: none;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+    .input-group .form-control {
+        border-left: none;
+    }
+
+    .input-group .form-control:focus {
+        border-left: none;
+    }
+</style>
+{% endblock %}

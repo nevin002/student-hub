@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - StudentHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-4 d-inline-block">
+                        <i class="bi bi-box-arrow-in-right text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+                <h1 class="display-6 fw-bold text-gradient mb-3" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    Welcome Back
+                </h1>
+                <p class="text-muted fs-5">Sign in to your StudentHub account</p>
+            </div>
+
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient text-white text-center py-4" style="background: var(--primary-gradient);">
+                    <h3 class="mb-0 fw-bold">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </h3>
+                </div>
+                <div class="card-body p-5">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-person me-2"></i>{{ form.username.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                {% for error in form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-lock me-2"></i>{{ form.password.label }}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                {% for error in form.password.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center">
+                        <div class="divider mb-4">
+                            <span class="divider-text">or</span>
+                        </div>
+                        
+                        <p class="text-muted mb-3">Don't have an account?</p>
+                        <a href="{% url 'accounts:signup' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-person-plus me-2"></i>Create Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Preview -->
+            <div class="row mt-5 g-3">
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-2 d-inline-block mb-2">
+                            <i class="bi bi-folder text-success" style="font-size: 1.25rem;"></i>
+                        </div>
+                        <p class="text-muted small mb-0">Resources</p>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-2 d-inline-block mb-2">
+                            <i class="bi bi-cash text-info" style="font-size: 1.25rem;"></i>
+                        </div>
+                        <p class="text-muted small mb-0">Expenses</p>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-2 d-inline-block mb-2">
+                            <i class="bi bi-chat text-warning" style="font-size: 1.25rem;"></i>
+                        </div>
+                        <p class="text-muted small mb-0">Blog</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background-size: 200% 200%;
+        animation: gradient 3s ease infinite;
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .card {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+        border: none;
+        padding: 2rem;
+    }
+
+    .form-label {
+        color: #374151;
+        margin-bottom: 0.75rem;
+    }
+
+    .form-control {
+        border-radius: var(--border-radius-sm);
+        border: 2px solid #e5e7eb;
+        padding: 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+        transform: translateY(-2px);
+    }
+
+    .invalid-feedback {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn {
+        border-radius: var(--border-radius-sm);
+        font-weight: 600;
+        padding: 1rem 2rem;
+        transition: all 0.3s ease;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline-primary {
+        border: 2px solid #667eea;
+        color: #667eea;
+        background: transparent;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .divider {
+        position: relative;
+        text-align: center;
+    }
+
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e5e7eb;
+    }
+
+    .divider-text {
+        background: white;
+        padding: 0 1rem;
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .bg-gradient {
+        background-size: 200% 200%;
+        animation: gradient 3s ease infinite;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+        
+        .btn {
+            padding: 0.875rem 1.5rem;
+        }
+    }
+</style>
+{% endblock %}

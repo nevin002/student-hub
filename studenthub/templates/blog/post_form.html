@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - StudentHub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-pencil-square"></i> {{ title }}
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                            {{ form.title.label }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-text">Choose a clear, descriptive title for your post</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">
+                            {{ form.content.label }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                            {% for error in form.content.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-text">Share your thoughts, experiences, or insights with the student community</div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-info">
+                            <i class="bi bi-check-circle"></i> Publish Post
+                        </button>
+                        <a href="{% url 'blog:post_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4 border-info">
+            <div class="card-body">
+                <h6 class="card-title text-info">
+                    <i class="bi bi-lightbulb"></i> Post ideas to get you started:
+                </h6>
+                <ul class="card-text small mb-0">
+                    <li><strong>Study Tips:</strong> Share your effective study strategies and techniques</li>
+                    <li><strong>Course Reviews:</strong> Write about your experience with specific courses</li>
+                    <li><strong>Campus Life:</strong> Share stories about student life, events, or activities</li>
+                    <li><strong>Academic Advice:</strong> Offer guidance to fellow students</li>
+                    <li><strong>Resource Recommendations:</strong> Suggest helpful tools, books, or websites</li>
+                    <li><strong>Personal Experiences:</strong> Share your journey and lessons learned</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-4 border-warning">
+            <div class="card-body">
+                <h6 class="card-title text-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Remember:
+                </h6>
+                <ul class="card-text small mb-0">
+                    <li>Be respectful and constructive in your writing</li>
+                    <li>Use appropriate language and avoid offensive content</li>
+                    <li>Don't share personal information about others without permission</li>
+                    <li>Engage with comments and feedback from other students</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

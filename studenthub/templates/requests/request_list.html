@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Requests - StudentHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header Section -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10 text-center">
+            <div class="glass-card p-5 mb-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1 class="display-5 fw-bold text-gradient mb-3" style="background: var(--warning-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                            <i class="bi bi-hand-index-thumb me-3"></i>Student Requests
+                        </h1>
+                        <p class="lead text-muted mb-4">Find requests from fellow students or post your own needs. Help each other out and earn money!</p>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h4 class="fw-bold text-primary mb-1">{{ total_requests }}</h4>
+                                    <p class="text-muted mb-0">Total Requests</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h4 class="fw-bold text-success mb-1">{{ open_requests }}</h4>
+                                    <p class="text-muted mb-0">Open Requests</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h4 class="fw-bold text-warning mb-1">{{ urgent_requests }}</h4>
+                                    <p class="text-muted mb-0">Urgent Requests</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'requests:request_create' %}" class="btn btn-warning btn-lg fw-bold">
+                                <i class="bi bi-plus-circle me-2"></i>Post a Request
+                            </a>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="btn btn-warning btn-lg fw-bold">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Login to Post Requests
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <div class="position-relative">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-5 d-inline-block">
+                                <i class="bi bi-hand-index-thumb text-warning" style="font-size: 4rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="bi bi-funnel me-2"></i>Filter & Search
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            {{ form.search }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.min_fee }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ form.max_fee }}
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-check">
+                                {{ form.is_urgent }}
+                                <label class="form-check-label" for="{{ form.is_urgent.id_for_label }}">
+                                    Urgent
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-search me-1"></i>Apply Filters
+                            </button>
+                            <a href="{% url 'requests:request_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Clear
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requests Grid -->
+    <div class="row g-4">
+        {% for request in page_obj %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 request-card">
+                    <div class="card-header d-flex justify-content-between align-items-start p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                <i class="bi bi-person text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-semibold">{{ request.requester.username }}</h6>
+                                <small class="text-muted">{{ request.created_at|timesince }} ago</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            {% if request.is_urgent %}
+                                <span class="badge bg-danger">Urgent</span>
+                            {% endif %}
+                            <span class="badge bg-{{ request.status|yesno:'success,warning,info,secondary' }}">
+                                {{ request.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-3">
+                        <h6 class="card-title fw-bold mb-2">{{ request.title }}</h6>
+                        <p class="card-text text-muted small mb-3">
+                            {{ request.description|truncatewords:20 }}
+                        </p>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-tag text-muted me-1"></i>
+                                    <small class="text-muted">{{ request.get_category_display }}</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-geo-alt text-muted me-1"></i>
+                                    <small class="text-muted">{{ request.location|default:"Anywhere" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="text-center">
+                                <h5 class="fw-bold text-success mb-0">${{ request.fee }}</h5>
+                                <small class="text-muted">Fee</small>
+                            </div>
+                            <div class="text-center">
+                                <h6 class="fw-bold text-primary mb-0">{{ request.total_offers }}</h6>
+                                <small class="text-muted">Offers</small>
+                            </div>
+                            {% if request.deadline %}
+                                <div class="text-center">
+                                    <h6 class="fw-bold text-warning mb-0">{{ request.deadline|timeuntil }}</h6>
+                                    <small class="text-muted">Left</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <a href="{% url 'requests:request_detail' request.pk %}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <div class="py-5">
+                    <div class="bg-light rounded-circle p-4 d-inline-block mb-3">
+                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="text-muted mb-2">No requests found</h4>
+                    <p class="text-muted mb-3">Try adjusting your filters or be the first to post a request!</p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'requests:request_create' %}" class="btn btn-warning">
+                            <i class="bi bi-plus-circle me-2"></i>Post First Request
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-8">
+                <nav aria-label="Requests pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Quick Links -->
+    {% if user.is_authenticated %}
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-8">
+                <div class="glass-card p-4">
+                    <div class="text-center mb-3">
+                        <h5 class="fw-bold mb-2">Quick Access</h5>
+                        <p class="text-muted mb-0">Manage your requests and offers</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="{% url 'requests:my_requests' %}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-list-ul me-2"></i>My Requests
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'requests:my_offers' %}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-hand-thumbs-up me-2"></i>My Offers
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .text-gradient {
+        background-size: 200% 200%;
+        animation: gradient 3s ease infinite;
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .request-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .request-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .pagination .page-link {
+        border-radius: var(--border-radius-sm);
+        border: none;
+        color: #667eea;
+        margin: 0 0.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .pagination .page-item.active .page-link {
+        background: var(--primary-gradient);
+        border-color: transparent;
+    }
+
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+        
+        .text-end {
+            text-align: left !important;
+            margin-top: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}

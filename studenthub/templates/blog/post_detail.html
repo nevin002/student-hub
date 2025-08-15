@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - StudentHub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Post Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h2 class="mb-1">{{ post.title }}</h2>
+                        <div class="text-muted">
+                            <i class="bi bi-person"></i> {{ post.author.username }} • 
+                            <i class="bi bi-calendar"></i> {{ post.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                    <div class="text-muted">
+                        <i class="bi bi-chat"></i> {{ post.comment_count }} comments
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="post-content">
+                    {{ post.content|linebreaks }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comments Section -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-dots"></i> Comments ({{ post.comment_count }})
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'blog:add_post_comment' post.pk %}" class="mb-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ comment_form.text }}
+                        </div>
+                        <button type="submit" class="btn btn-info">
+                            <i class="bi bi-send"></i> Add Comment
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Please <a href="{% url 'accounts:login' %}">login</a> to add comments.
+                    </div>
+                {% endif %}
+                
+                <hr>
+                
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div class="d-flex mb-3">
+                            <img src="{{ comment.author.profile.avatar.url }}" alt="Avatar" 
+                                 class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6 class="mb-1">{{ comment.author.username }}</h6>
+                                    <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+                                </div>
+                                <p class="mb-0">{{ comment.text|linebreaks }}</p>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3">No comments yet. Be the first to comment!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Post Info</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-12">
+                        <h5 class="text-info">{{ post.comment_count }}</h5>
+                        <small class="text-muted">Comments</small>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <strong>Author:</strong>
+                    <div class="d-flex align-items-center mt-2">
+                        <img src="{{ post.author.profile.avatar.url }}" alt="Avatar" 
+                             class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                        <div>
+                            <div>{{ post.author.username }}</div>
+                            <small class="text-muted">Member since {{ post.author.date_joined|date:"M Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Posted:</strong>
+                    <div class="text-muted">{{ post.created_at|date:"F d, Y" }}</div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'blog:post_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Blog
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'blog:post_create' %}" class="btn btn-info">
+                            <i class="bi bi-plus-circle"></i> Write Post
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Posts -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-arrow-right-circle"></i> Recent Posts</h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for recent_post in post.author.posts.all|slice:":5" %}
+                        {% if recent_post != post %}
+                            <a href="{% url 'blog:post_detail' recent_post.pk %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ recent_post.title|truncatechars:30 }}</h6>
+                                    <small class="text-muted">{{ recent_post.created_at|date:"M d" }}</small>
+                                </div>
+                                <small class="text-muted">{{ recent_post.content|truncatechars:50 }}</small>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

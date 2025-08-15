@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Resources - StudentHub{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-folder-fill text-primary"></i> Resources</h2>
+    {% if user.is_authenticated %}
+        <a href="{% url 'resources:resource_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Share Resource
+        </a>
+    {% endif %}
+</div>
+
+<!-- Search Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-8">
+                <input type="text" name="q" value="{{ query }}" class="form-control" 
+                       placeholder="Search resources by title, description, or tags...">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Resources Grid -->
+{% if page_obj %}
+    <div class="row">
+        {% for resource in page_obj %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'resources:resource_detail' resource.pk %}" class="text-decoration-none">
+                                {{ resource.title }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted small">
+                            {{ resource.description|truncatewords:20 }}
+                        </p>
+                        
+                        {% if resource.tags.all %}
+                            <div class="mb-2">
+                                {% for tag in resource.tags.all|slice:":3" %}
+                                    <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+                                {% endfor %}
+                                {% if resource.tags.count > 3 %}
+                                    <span class="badge bg-light text-dark">+{{ resource.tags.count|add:"-3" }} more</span>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> {{ resource.author.username }}
+                            </small>
+                            <div class="text-muted small">
+                                <i class="bi bi-hand-thumbs-up"></i> {{ resource.upvote_count }}
+                                <i class="bi bi-chat ms-2"></i> {{ resource.comment_count }}
+                            </div>
+                        </div>
+                        
+                        {% if resource.file %}
+                            <div class="mt-2">
+                                <i class="bi bi-file-earmark"></i>
+                                <small class="text-muted">{{ resource.file.name|cut:"resources/" }}</small>
+                            </div>
+                        {% endif %}
+                        
+                        {% if resource.link %}
+                            <div class="mt-2">
+                                <i class="bi bi-link-45deg"></i>
+                                <a href="{{ resource.link }}" target="_blank" class="small">External Link</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i> {{ resource.created_at|date:"M d, Y" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <nav aria-label="Resource pagination">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+    
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-folder-x text-muted" style="font-size: 4rem;"></i>
+        <h4 class="text-muted mt-3">No resources found</h4>
+        {% if query %}
+            <p class="text-muted">No resources match your search for "{{ query }}"</p>
+            <a href="{% url 'resources:resource_list' %}" class="btn btn-outline-primary">View All Resources</a>
+        {% else %}
+            <p class="text-muted">Be the first to share a resource!</p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'resources:resource_create' %}" class="btn btn-primary">Share Resource</a>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
